@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Головна - Manga Reader{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">Ласкаво просимо до MangaReader</h1>
+    <p class="hero-subtitle">Читайте свою улюблену мангу онлайн</p>
+</div>
+
+<div class="manga-grid">
+    {% if manga_list %}
+    {% for manga in manga_list %}
+    <a href="{{ url_for('manga_detail', manga_id=manga.id) }}" class="manga-card">
+        <div class="manga-cover">
+            {% if manga.cover_url %}
+            <img src="{{ manga.cover_url }}" alt="{{ manga.title }}" loading="lazy">
+            {% else %}
+            <div class="no-cover">📖</div>
+            {% endif %}
+        </div>
+        <div class="manga-info">
+            <h3 class="manga-title">{{ manga.title }}</h3>
+            {% if manga.author %}
+            <p class="manga-author">{{ manga.author }}</p>
+            {% endif %}
+            <p class="manga-chapters">{{ manga.chapters|length }} розділів</p>
+        </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <h2>😔 Поки що немає манги</h2>
+        <p>Додайте свою першу мангу через <a href="{{ url_for('admin') }}">адмін-панель</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

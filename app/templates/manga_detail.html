@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ manga.title }} - Manga Reader{% endblock %}
+
+{% block content %}
+<div class="manga-detail-container">
+    <div class="manga-header">
+        <div class="manga-cover-large">
+            {% if manga.cover_url %}
+            <img src="{{ manga.cover_url }}" alt="{{ manga.title }}">
+            {% else %}
+            <div class="no-cover-large">📖</div>
+            {% endif %}
+        </div>
+        <div class="manga-details">
+            <h1 class="manga-detail-title">{{ manga.title }}</h1>
+            {% if manga.author %}
+            <p class="manga-detail-author">Автор: {{ manga.author }}</p>
+            {% endif %}
+            {% if manga.description %}
+            <p class="manga-description">{{ manga.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="chapters-section">
+        <h2 class="section-title">Розділи</h2>
+        {% if chapters %}
+        <div class="chapters-list">
+            {% for chapter in chapters %}
+            <a href="{{ url_for('reader', chapter_id=chapter.id) }}" class="chapter-item">
+                <span class="chapter-number">Розділ {{ chapter.chapter_number }}</span>
+                {% if chapter.title %}
+                <span class="chapter-title">- {{ chapter.title }}</span>
+                {% endif %}
+                <span class="chapter-arrow">→</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="no-chapters">Поки що немає розділів для цієї манги</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

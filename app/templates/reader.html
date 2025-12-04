@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ chapter.manga.title }} - Розділ {{ chapter.chapter_number }}{% endblock %}
+
+{% block content %}
+<div class="reader-container">
+    <div class="reader-header">
+        <a href="{{ url_for('manga_detail', manga_id=chapter.manga_id) }}" class="back-button">← Назад до {{
+            chapter.manga.title }}</a>
+        <h2 class="reader-title">Розділ {{ chapter.chapter_number }}{% if chapter.title %} - {{ chapter.title }}{% endif
+            %}</h2>
+    </div>
+
+    <div class="reader-navigation">
+        {% if prev_chapter %}
+        <a href="{{ url_for('reader', chapter_id=prev_chapter.id) }}" class="nav-button prev-button">
+            ← Попередній розділ
+        </a>
+        {% else %}
+        <span class="nav-button disabled">← Попередній розділ</span>
+        {% endif %}
+
+        <span class="chapter-info">Розділ {{ chapter.chapter_number }}</span>
+
+        {% if next_chapter %}
+        <a href="{{ url_for('reader', chapter_id=next_chapter.id) }}" class="nav-button next-button">
+            Наступний розділ →
+        </a>
+        {% else %}
+        <span class="nav-button disabled">Наступний розділ →</span>
+        {% endif %}
+    </div>
+
+    <div class="reader-pages">
+        {% if pages %}
+        {% for page in pages %}
+        <div class="page-container" data-page="{{ page.page_number }}">
+            <img src="{{ page.image_url }}" alt="Сторінка {{ page.page_number }}" class="page-image" loading="lazy">
+            <div class="page-number">Сторінка {{ page.page_number }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="no-pages">
+            <p>😔 У цьому розділі поки немає сторінок</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="reader-navigation bottom-nav">
+        {% if prev_chapter %}
+        <a href="{{ url_for('reader', chapter_id=prev_chapter.id) }}" class="nav-button prev-button">
+            ← Попередній розділ
+        </a>
+        {% else %}
+        <span class="nav-button disabled">← Попередній розділ</span>
+        {% endif %}
+
+        {% if next_chapter %}
+        <a href="{{ url_for('reader', chapter_id=next_chapter.id) }}" class="nav-button next-button">
+            Наступний розділ →
+        </a>
+        {% else %}
+        <span class="nav-button disabled">Наступний розділ →</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Smooth scroll to page on load if hash is present
+    if (window.location.hash) {
+        const pageNumber = window.location.hash.substring(1);
+        const pageElement = document.querySelector(`[data-page="${pageNumber}"]`);
+        if (pageElement) {
+            setTimeout(() => {
+                pageElement.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+    }
+</script>
+{% endblock %}

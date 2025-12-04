@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Адмін-панель - Manga Reader{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1 class="admin-title">Адміністрування</h1>
+
+    <div class="admin-grid">
+        <!-- Add Manga Form -->
+        <div class="admin-card">
+            <h2 class="card-title">➕ Додати мангу</h2>
+            <form method="POST" action="{{ url_for('add_manga') }}" class="admin-form">
+                <div class="form-group">
+                    <label for="title">Назва *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Автор</label>
+                    <input type="text" id="author" name="author">
+                </div>
+
+                <div class="form-group">
+                    <label for="cover_url">URL обкладинки</label>
+                    <input type="url" id="cover_url" name="cover_url" placeholder="https://example.com/cover.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Опис</label>
+                    <textarea id="description" name="description" rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">Додати мангу</button>
+            </form>
+        </div>
+
+        <!-- Add Chapter Form -->
+        <div class="admin-card">
+            <h2 class="card-title">📖 Додати розділ</h2>
+            <form method="POST" action="{{ url_for('add_chapter') }}" class="admin-form">
+                <div class="form-group">
+                    <label for="manga_id">Манга *</label>
+                    <select id="manga_id" name="manga_id" required>
+                        <option value="">Оберіть мангу</option>
+                        {% for manga in manga_list %}
+                        <option value="{{ manga.id }}">{{ manga.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="chapter_number">Номер розділу *</label>
+                    <input type="number" id="chapter_number" name="chapter_number" step="0.1" required placeholder="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="chapter_title">Назва розділу</label>
+                    <input type="text" id="chapter_title" name="title" placeholder="Опціонально">
+                </div>
+
+                <button type="submit" class="btn-primary">Додати розділ</button>
+            </form>
+        </div>
+
+        <!-- Add Pages Form -->
+        <div class="admin-card full-width">
+            <h2 class="card-title">🖼️ Додати сторінки</h2>
+            <form method="POST" action="{{ url_for('add_pages') }}" class="admin-form">
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label for="page_manga_id">Манга *</label>
+                        <select id="page_manga_id" name="page_manga_id" required onchange="loadChapters(this.value)">
+                            <option value="">Оберіть мангу</option>
+                            {% for manga in manga_list %}
+                            <option value="{{ manga.id }}">{{ manga.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group flex-1">
+                        <label for="chapter_id">Розділ *</label>
+                        <select id="chapter_id" name="chapter_id" required>
+                            <option value="">Спочатку оберіть мангу</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="page_urls">URL сторінок (по одному на рядок) *</label>
+                    <textarea id="page_urls" name="page_urls" rows="10" required
+                        placeholder="https://example.com/page1.jpg&#10;https://example.com/page2.jpg&#10;https://example.com/page3.jpg"></textarea>
+                    <small class="form-hint">Вставте URL зображень, кожен на новому рядку. Вони будуть автоматично
+                        пронумеровані.</small>
+                </div>
+
+                <button type="submit" class="btn-primary">Додати сторінки</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadChapters(mangaId) {
+        const chapterSelect = document.getElementById('chapter_id');
+
+        if (!mangaId) {
+            chapterSelect.innerHTML = '<option value="">Спочатку оберіть мангу</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/get_chapters/${mangaId}`);
+            const chapters = await response.json();
+
+            if (chapters.length === 0) {
+                chapterSelect.innerHTML = '<option value="">Немає розділів для цієї манги</option>';
+            } else {
+                chapterSelect.innerHTML = '<option value="">Оберіть розділ</option>';
+                chapters.forEach(chapter => {
+                    const option = document.createElement('option');
+                    option.value = chapter.id;
+                    option.textContent = `Розділ ${chapter.chapter_number}${chapter.title ? ' - ' + chapter.title : ''}`;
+                    chapterSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading chapters:', error);
+            chapterSelect.innerHTML = '<option value="">Помилка завантаження розділів</option>';
+        }
+    }
+</script>
+{% endblock %}
