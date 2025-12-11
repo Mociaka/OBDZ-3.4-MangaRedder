@@ -10,7 +10,6 @@ class Manga(db.Model):
     cover_url = db.Column(db.String(500))
     author = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     chapters = db.relationship('Chapter', backref='manga', lazy=True, cascade='all, delete-orphan')
     
@@ -26,7 +25,6 @@ class Chapter(db.Model):
     chapter_number = db.Column(db.Float, nullable=False)
     title = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     pages = db.relationship('Page', backref='chapter', lazy=True, cascade='all, delete-orphan', order_by='Page.page_number')
     
